@@ -4,95 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebForUbuntu</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            color: #e0e0e0;
-        }
-        .container {
-            text-align: center;
-            padding: 3rem;
-            border-radius: 16px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-        }
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            color: #e94560;
-        }
-        p {
-            font-size: 1.1rem;
-            color: #a0a0b0;
-        }
-        .status {
-            margin-top: 1.5rem;
-            padding: 0.5rem 1.5rem;
-            border-radius: 20px;
-            background: rgba(46,213,115,0.2);
-            color: #2ed573;
-            font-weight: 500;
-        }
-        .btn {
-            margin-top: 1.5rem;
-            padding: 0.75rem 2rem;
-            font-size: 1rem;
-            border: none;
-            border-radius: 8px;
-            background: #e94560;
-            color: #fff;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.2s;
-        }
-        .btn:hover {
-            background: #c73650;
-            transform: scale(1.05);
-        }
-        .btn:active {
-            transform: scale(0.97);
-        }
-        .image-box {
-            margin-top: 1.5rem;
-            max-width: 500px;
-        }
-        .image-box img {
-            width: 100%;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-        }
-        .hidden {
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>🚀 WebForUbuntu</h1>
-        <p>简易 Web 服务运行成功！</p>
-        <div class="status">● 服务运行在 localhost:8080</div>
+        <h1>🤖 213:</h1>
+        <p>点击按钮开始游戏</p>
+        <div class="status">● 等待点击按钮</div>
         <button class="btn" id="showImageBtn">📷 显示图片</button>
+        <div class="progress-container hidden" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
         <div class="image-box hidden" id="imageBox">
             <img src="nailong.jpg" alt="nailong">
         </div>
     </div>
     <script>
+        var isLoaded = false;
         document.getElementById('showImageBtn').addEventListener('click', function() {
-            var imageBox = document.getElementById('imageBox');
             var btn = this;
-            if (imageBox.classList.contains('hidden')) {
-                imageBox.classList.remove('hidden');
-                btn.textContent = '🔽 隐藏图片';
-            } else {
+            var progressContainer = document.getElementById('progressContainer');
+            var progressBar = document.getElementById('progressBar');
+            var imageBox = document.getElementById('imageBox');
+            
+            if (!isLoaded) {
+                btn.disabled = true;
+                btn.textContent = '⏳ 加载中...';
+                
+                progressContainer.classList.remove('hidden');
                 imageBox.classList.add('hidden');
-                btn.textContent = '📷 显示图片';
+                
+                setTimeout(function() {
+                    progressBar.classList.add('completed');
+                }, 10);
+                
+                progressBar.addEventListener('transitionend', function showImage() {
+                    progressContainer.classList.add('hidden');
+                    imageBox.classList.remove('hidden');
+                    btn.disabled = false;
+                    btn.textContent = '🔽 隐藏图片';
+                    progressBar.classList.remove('completed');
+                    progressBar.removeEventListener('transitionend', showImage);
+                    isLoaded = true;
+                });
+            } else {
+                if (imageBox.classList.contains('hidden')) {
+                    imageBox.classList.remove('hidden');
+                    btn.textContent = '🔽 隐藏图片';
+                } else {
+                    imageBox.classList.add('hidden');
+                    btn.textContent = '📷 显示图片';
+                }
             }
         });
     </script>
