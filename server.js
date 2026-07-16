@@ -14,11 +14,12 @@ const MIME_TYPES = {
     '.jpg': 'image/jpeg',
     '.svg': 'image/svg+xml',
     '.ico': 'image/x-icon',
+    '.mp4': 'video/mp4',
 };
 
 const server = http.createServer((req, res) => {
-    // 默认提供 index.html
-    let filePath = req.url === '/' ? '/index.html' : req.url;
+    // 默认提供 index.html，并对中文文件名进行 URL 解码
+    let filePath = req.url === '/' ? '/index.html' : decodeURIComponent(req.url);
     filePath = path.join(__dirname, filePath);
 
     const ext = path.extname(filePath);

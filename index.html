@@ -10,10 +10,13 @@
     <div class="container">
         <h1>🤖 213:</h1>
         <p>点击按钮开始游戏</p>
-        <div class="status">● 等待点击按钮</div>
-        <button class="btn" id="showImageBtn">📷 显示图片</button>
-        <div class="progress-container hidden" id="progressContainer">
-            <div class="progress-bar" id="progressBar"></div>
+        <div class="status" id="status">● 等待点击按钮</div>
+        <button class="btn" id="actionBtn">📷 显示图片</button>
+        <div class="video-container hidden" id="videoContainer">
+            <video id="loadingVideo" muted preload="auto" width="500">
+                <source src="新宿决战.mp4" type="video/mp4">
+                您的浏览器不支持视频播放。
+            </video>
         </div>
         <div class="image-box hidden" id="imageBox">
             <img src="nailong.jpg" alt="nailong">
@@ -21,39 +24,44 @@
     </div>
     <script>
         var isLoaded = false;
-        document.getElementById('showImageBtn').addEventListener('click', function() {
-            var btn = this;
-            var progressContainer = document.getElementById('progressContainer');
-            var progressBar = document.getElementById('progressBar');
-            var imageBox = document.getElementById('imageBox');
-            
+        var btn = document.getElementById('actionBtn');
+        var statusEl = document.getElementById('status');
+        var videoContainer = document.getElementById('videoContainer');
+        var video = document.getElementById('loadingVideo');
+        var imageBox = document.getElementById('imageBox');
+
+        btn.addEventListener('click', function() {
             if (!isLoaded) {
+                // 第一次点击：播放视频过场动画
                 btn.disabled = true;
                 btn.textContent = '⏳ 加载中...';
-                
-                progressContainer.classList.remove('hidden');
+                statusEl.textContent = '▶ 加载中...';
+
                 imageBox.classList.add('hidden');
-                
-                setTimeout(function() {
-                    progressBar.classList.add('completed');
-                }, 10);
-                
-                progressBar.addEventListener('transitionend', function showImage() {
-                    progressContainer.classList.add('hidden');
+                videoContainer.classList.remove('hidden');
+                video.currentTime = 0;
+                video.play();
+
+                // 视频播放结束后显示图片
+                video.addEventListener('ended', function onEnded() {
+                    video.removeEventListener('ended', onEnded);
+                    videoContainer.classList.add('hidden');
                     imageBox.classList.remove('hidden');
                     btn.disabled = false;
                     btn.textContent = '🔽 隐藏图片';
-                    progressBar.classList.remove('completed');
-                    progressBar.removeEventListener('transitionend', showImage);
+                    statusEl.textContent = '● 加载完成';
                     isLoaded = true;
                 });
             } else {
+                // 已加载：切换图片显示/隐藏
                 if (imageBox.classList.contains('hidden')) {
                     imageBox.classList.remove('hidden');
                     btn.textContent = '🔽 隐藏图片';
+                    statusEl.textContent = '● 已显示图片';
                 } else {
                     imageBox.classList.add('hidden');
                     btn.textContent = '📷 显示图片';
+                    statusEl.textContent = '● 图片已隐藏';
                 }
             }
         });

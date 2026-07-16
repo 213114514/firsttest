@@ -57,6 +57,18 @@ p {
     cursor: not-allowed;
     transform: none;
 }
+.video-container {
+    margin-top: 1.5rem;
+    max-width: 500px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.video-container video {
+    display: block;
+    width: 100%;
+    height: auto;
+}
 .image-box {
     margin-top: 1.5rem;
     max-width: 500px;
@@ -68,23 +80,4 @@ p {
 }
 .hidden {
     display: none;
-}
-.progress-container {
-    margin-top: 1.5rem;
-    width: 100%;
-    max-width: 300px;
-    height: 20px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 10px;
-    overflow: hidden;
-}
-.progress-bar {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #e94560, #c73650);
-    border-radius: 10px;
-    transition: width 10s linear;
-}
-.progress-bar.completed {
-    width: 100%;
 }
