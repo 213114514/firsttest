@@ -7,22 +7,109 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>🤖 213:</h1>
-        <p>点击按钮开始游戏</p>
-        <div class="status" id="status">● 等待点击按钮</div>
-        <button class="btn" id="actionBtn">📷 显示图片</button>
-        <div class="video-container hidden" id="videoContainer">
-            <video id="loadingVideo" preload="auto" width="500">
-                <source src="新宿决战.mp4" type="video/mp4">
-                您的浏览器不支持视频播放。
-            </video>
-        </div>
-        <div class="image-box hidden" id="imageBox">
-            <img src="nailong.jpg" alt="nailong">
+    <!-- ====== 导航标签 ====== -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" data-page="home">🏠 主页</button>
+        <button class="nav-tab" data-page="game24">🎮 24点游戏</button>
+    </div>
+
+    <!-- ====== 主页 ====== -->
+    <div id="page-home" class="page active">
+        <div class="container">
+            <h1>🤖 213:</h1>
+            <p>点击按钮开始游戏</p>
+            <div class="status" id="status">● 等待点击按钮</div>
+            <button class="btn" id="actionBtn">📷 显示图片</button>
+            <div class="video-container hidden" id="videoContainer">
+                <video id="loadingVideo" preload="auto" width="500">
+                    <source src="新宿决战.mp4" type="video/mp4">
+                    您的浏览器不支持视频播放。
+                </video>
+            </div>
+            <div class="image-box hidden" id="imageBox">
+                <img src="nailong.jpg" alt="nailong">
+            </div>
         </div>
     </div>
+
+    <!-- ====== 24点游戏页 ====== -->
+    <div id="page-game24" class="page">
+        <div class="container game24-container">
+            <h1>🎯 24 点</h1>
+            <p class="game24-intro">用四张扑克牌通过 <strong>+ − × ÷</strong> 运算得到 <strong>24</strong></p>
+
+            <!-- 扑克牌区域 -->
+            <div class="cards" id="cards">
+                <div class="card" data-index="0">
+                    <div class="card-corner top"><span class="card-rank"></span><span class="card-suit"></span></div>
+                    <div class="card-center"><span class="card-suit-big"></span></div>
+                    <div class="card-corner bottom"><span class="card-rank"></span><span class="card-suit"></span></div>
+                </div>
+                <div class="card" data-index="1">
+                    <div class="card-corner top"><span class="card-rank"></span><span class="card-suit"></span></div>
+                    <div class="card-center"><span class="card-suit-big"></span></div>
+                    <div class="card-corner bottom"><span class="card-rank"></span><span class="card-suit"></span></div>
+                </div>
+                <div class="card" data-index="2">
+                    <div class="card-corner top"><span class="card-rank"></span><span class="card-suit"></span></div>
+                    <div class="card-center"><span class="card-suit-big"></span></div>
+                    <div class="card-corner bottom"><span class="card-rank"></span><span class="card-suit"></span></div>
+                </div>
+                <div class="card" data-index="3">
+                    <div class="card-corner top"><span class="card-rank"></span><span class="card-suit"></span></div>
+                    <div class="card-center"><span class="card-suit-big"></span></div>
+                    <div class="card-corner bottom"><span class="card-rank"></span><span class="card-suit"></span></div>
+                </div>
+            </div>
+
+            <p class="game24-hint">💡 点击扑克牌将数字添加到算式</p>
+
+            <!-- 输入区域 -->
+            <div class="game24-input-area">
+                <input type="text" id="exprInput" placeholder="输入算式，如 (1+2+3)×4" maxlength="50" autocomplete="off" spellcheck="false" />
+                <button class="btn game24-btn" id="checkBtn">✅ 验证</button>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="game24-actions">
+                <button class="btn game24-btn secondary" id="hintBtn">💡 提示</button>
+                <button class="btn game24-btn secondary" id="dealBtn">🔄 发牌</button>
+            </div>
+
+            <!-- 结果显示 -->
+            <div id="resultMsg" class="game24-result"></div>
+            <div id="stats" class="game24-stats">答对 <span id="scoreNum">0</span> / <span id="totalNum">0</span></div>
+        </div>
+    </div>
+
     <script>
+        // =====================================================
+        // 1. 页面导航切换
+        // =====================================================
+        var navTabs = document.querySelectorAll('.nav-tab');
+        var pages = {
+            home: document.getElementById('page-home'),
+            game24: document.getElementById('page-game24'),
+        };
+
+        navTabs.forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                var target = this.getAttribute('data-page');
+
+                // 切换标签高亮
+                navTabs.forEach(function(t) { t.classList.remove('active'); });
+                this.classList.add('active');
+
+                // 切换页面
+                Object.keys(pages).forEach(function(key) {
+                    pages[key].classList.toggle('active', key === target);
+                });
+            });
+        });
+
+        // =====================================================
+        // 2. 原主页逻辑（视频 → 图片 加载）
+        // =====================================================
         var isLoaded = false;
         var btn = document.getElementById('actionBtn');
         var statusEl = document.getElementById('status');
@@ -32,7 +119,6 @@
 
         btn.addEventListener('click', function() {
             if (!isLoaded) {
-                // 第一次点击：播放视频过场动画
                 btn.disabled = true;
                 btn.textContent = '⏳ 加载中...';
                 statusEl.textContent = '▶ 加载中...';
@@ -42,7 +128,6 @@
                 video.currentTime = 0;
                 video.play();
 
-                // 视频播放结束后显示图片
                 video.addEventListener('ended', function onEnded() {
                     video.removeEventListener('ended', onEnded);
                     videoContainer.classList.add('hidden');
@@ -53,7 +138,6 @@
                     isLoaded = true;
                 });
             } else {
-                // 已加载：切换图片显示/隐藏
                 if (imageBox.classList.contains('hidden')) {
                     imageBox.classList.remove('hidden');
                     btn.textContent = '🔽 隐藏图片';
@@ -65,6 +149,293 @@
                 }
             }
         });
+
+        // =====================================================
+        // 3. 24点游戏逻辑
+        // =====================================================
+
+        // ----- 工具函数 -----
+        var SUITS = ['♠', '♥', '♦', '♣'];
+        var SUIT_COLORS = { '♠': '#333', '♥': '#e74c3c', '♦': '#e74c3c', '♣': '#333' };
+
+        function rankLabel(n) {
+            if (n === 1) return 'A';
+            if (n === 11) return 'J';
+            if (n === 12) return 'Q';
+            if (n === 13) return 'K';
+            return '' + n;
+        }
+
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // ----- 游戏状态 -----
+        var currentCards = [];       // 4个数字
+        var currentSolution = '';    // 当前一种解法
+        var hasSolution = false;     // 是否有解
+        var score = 0;
+        var total = 0;
+
+        // DOM 引用
+        var cardEls = document.querySelectorAll('.card');
+        var exprInput = document.getElementById('exprInput');
+        var checkBtn = document.getElementById('checkBtn');
+        var hintBtn = document.getElementById('hintBtn');
+        var dealBtn = document.getElementById('dealBtn');
+        var resultMsg = document.getElementById('resultMsg');
+        var scoreNum = document.getElementById('scoreNum');
+        var totalNum = document.getElementById('totalNum');
+
+        // ----- 24点求解器 -----
+        function solve24(nums) {
+            var ops = ['+', '-', '*', '/'];
+            var solutions = [];
+
+            // 排列生成
+            function permute(arr) {
+                if (arr.length <= 1) return [arr.slice()];
+                var result = [];
+                for (var i = 0; i < arr.length; i++) {
+                    var rest = arr.slice(0, i).concat(arr.slice(i + 1));
+                    for (var p of permute(rest)) {
+                        result.push([arr[i]].concat(p));
+                    }
+                }
+                return result;
+            }
+
+            function calc(a, op, b) {
+                switch (op) {
+                    case '+': return a + b;
+                    case '-': return a - b;
+                    case '*': return a * b;
+                    case '/': return Math.abs(b) < 1e-12 ? NaN : a / b;
+                }
+                return NaN;
+            }
+
+            var perms = permute(nums);
+            var seen = new Set();
+
+            for (var pi = 0; pi < perms.length; pi++) {
+                var p = perms[pi];
+                var a = p[0],
+                    b = p[1],
+                    c = p[2],
+                    d = p[3];
+                for (var oi = 0; oi < 4; oi++) {
+                    for (var oj = 0; oj < 4; oj++) {
+                        for (var ok = 0; ok < 4; ok++) {
+                            var op1 = ops[oi],
+                                op2 = ops[oj],
+                                op3 = ops[ok];
+
+                            // 5 种括号结构
+                            var results = [
+                                calc(calc(calc(a, op1, b), op2, c), op3, d),
+                                calc(calc(a, op1, calc(b, op2, c)), op3, d),
+                                calc(calc(a, op1, b), op2, calc(c, op3, d)),
+                                calc(a, op1, calc(calc(b, op2, c), op3, d)),
+                                calc(a, op1, calc(b, op2, calc(c, op3, d))),
+                            ];
+
+                            var exprs = [
+                                '((' + a + ' ' + op1 + ' ' + b + ') ' + op2 + ' ' + c + ') ' + op3 + ' ' + d,
+                                '(' + a + ' ' + op1 + ' (' + b + ' ' + op2 + ' ' + c + ')) ' + op3 + ' ' + d,
+                                '(' + a + ' ' + op1 + ' ' + b + ') ' + op2 + ' (' + c + ' ' + op3 + ' ' + d + ')',
+                                a + ' ' + op1 + ' ((' + b + ' ' + op2 + ' ' + c + ') ' + op3 + ' ' + d + ')',
+                                a + ' ' + op1 + ' (' + b + ' ' + op2 + ' (' + c + ' ' + op3 + ' ' + d + '))',
+                            ];
+
+                            for (var si = 0; si < 5; si++) {
+                                if (!isNaN(results[si]) && Math.abs(results[si] - 24) < 1e-9) {
+                                    var key = exprs[si];
+                                    if (!seen.has(key)) {
+                                        seen.add(key);
+                                        solutions.push(key);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return solutions;
+        }
+
+        // ----- 渲染扑克牌 -----
+        function renderCards(nums) {
+            var suits = [];
+            for (var i = 0; i < 4; i++) {
+                suits.push(SUITS[randomInt(0, 3)]);
+            }
+
+            for (var i = 0; i < 4; i++) {
+                var card = cardEls[i];
+                var num = nums[i];
+                var suit = suits[i];
+                var rank = rankLabel(num);
+                var color = SUIT_COLORS[suit];
+
+                card.querySelectorAll('.card-rank').forEach(function(el) { el.textContent = rank; });
+                card.querySelectorAll('.card-suit').forEach(function(el) { el.textContent = suit; });
+                card.querySelectorAll('.card-suit-big').forEach(function(el) { el.textContent = suit; });
+
+                // 设置颜色
+                card.style.color = color;
+                // 更新 data-value 以便点击添加
+                card.setAttribute('data-value', num);
+            }
+        }
+
+        // ----- 发牌 -----
+        function deal() {
+            // 生成4个1-13的随机数
+            var nums = [];
+            for (var i = 0; i < 4; i++) {
+                nums.push(randomInt(1, 13));
+            }
+            currentCards = nums;
+
+            // 求解
+            var solutions = solve24(nums);
+            hasSolution = solutions.length > 0;
+            currentSolution = hasSolution ? solutions[0] : '';
+
+            // 渲染
+            renderCards(nums);
+            exprInput.value = '';
+            resultMsg.className = 'game24-result';
+            resultMsg.textContent = '';
+            if (!hasSolution) {
+                resultMsg.textContent = '⚠️ 这四张牌无解，点击"发牌"重新发牌';
+                resultMsg.classList.add('warn');
+            }
+
+            // 更新统计
+            updateStats();
+        }
+
+        // ----- 验证用户答案 -----
+        function checkAnswer() {
+            var input = exprInput.value.trim();
+            if (!input) {
+                showResult('请输入算式', 'warn');
+                return;
+            }
+
+            // 替换 × → * ， ÷ → /
+            var expr = input.replace(/×/g, '*').replace(/÷/g, '/');
+
+            // 提取用户使用的数字
+            var tokens = expr.match(/\d+/g);
+            if (!tokens || tokens.length !== 4) {
+                showResult('请恰好使用4个数字', 'warn');
+                return;
+            }
+            var userNums = tokens.map(Number);
+
+            // 排序比较
+            var givenSorted = currentCards.slice().sort(function(a, b) { return a - b; });
+            var userSorted = userNums.slice().sort(function(a, b) { return a - b; });
+
+            for (var i = 0; i < 4; i++) {
+                if (userSorted[i] !== givenSorted[i]) {
+                    showResult('请使用发牌的4个数字，每个只用一次', 'warn');
+                    return;
+                }
+            }
+
+            // 计算结果
+            var result;
+            try {
+                // 只允许数字、运算符、括号、小数点
+                if (!/^[\d+\-*/().]+$/.test(expr)) {
+                    showResult('算式包含非法字符', 'warn');
+                    return;
+                }
+                result = Function('"use strict"; return (' + expr + ')')();
+            } catch (e) {
+                showResult('算式格式有误，请检查', 'warn');
+                return;
+            }
+
+            if (typeof result !== 'number' || isNaN(result) || !isFinite(result)) {
+                showResult('算式结果无效（可能除以了零）', 'warn');
+                return;
+            }
+
+            total++;
+            if (Math.abs(result - 24) < 1e-9) {
+                score++;
+                showResult('✅ 恭喜你，回答正确！ 🎉', 'success');
+            } else {
+                showResult('❌ 结果不等于 24（得到 ' + result + '），再想想', 'fail');
+            }
+
+            updateStats();
+        }
+
+        // ----- 显示提示 -----
+        function showHint() {
+            if (!hasSolution) {
+                showResult('⚠️ 这四张牌无解，重新发牌吧', 'warn');
+                return;
+            }
+            // 美化显示：替换 * → × ， / → ÷
+            var display = currentSolution.replace(/\*/g, ' × ').replace(/\//g, ' ÷ ').replace(/\+/g, ' + ').replace(/\-/g, ' − ');
+            showResult('💡 提示：' + display, 'hint');
+        }
+
+        // ----- 显示结果 -----
+        function showResult(text, type) {
+            resultMsg.className = 'game24-result';
+            resultMsg.textContent = text;
+            if (type) resultMsg.classList.add(type);
+        }
+
+        // ----- 更新统计 -----
+        function updateStats() {
+            scoreNum.textContent = score;
+            totalNum.textContent = total;
+        }
+
+        // ----- 事件绑定 -----
+
+        // 点击扑克牌 → 添加数字到输入框
+        cardEls.forEach(function(card) {
+            card.addEventListener('click', function() {
+                var val = this.getAttribute('data-value');
+                if (val) {
+                    exprInput.value += val;
+                    exprInput.focus();
+                }
+            });
+        });
+
+        // 验证按钮
+        checkBtn.addEventListener('click', checkAnswer);
+
+        // 回车键验证
+        exprInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                checkAnswer();
+            }
+        });
+
+        // 提示按钮
+        hintBtn.addEventListener('click', showHint);
+
+        // 发牌按钮
+        dealBtn.addEventListener('click', function() {
+            deal();
+        });
+
+        // ----- 初始化游戏 -----
+        deal();
     </script>
 </body>
 </html>

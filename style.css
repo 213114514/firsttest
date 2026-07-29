@@ -1,3 +1,6 @@
+/* ============================================================
+   全局重置 & 基础样式
+   ============================================================ */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -8,7 +11,66 @@ body {
     align-items: center;
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
     color: #e0e0e0;
+    padding-top: 80px; /* 为顶部导航留空间 */
 }
+
+/* ============================================================
+   页面切换
+   ============================================================ */
+.page { display: none; }
+.page.active { display: flex; justify-content: center; align-items: center; width: 100%; }
+
+/* ============================================================
+   导航标签
+   ============================================================ */
+.nav-tabs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    background: rgba(15, 15, 35, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 0;
+}
+.nav-tab {
+    padding: 16px 36px;
+    font-size: 1.05rem;
+    border: none;
+    background: transparent;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.3s, background 0.3s, box-shadow 0.3s;
+    position: relative;
+    font-family: inherit;
+}
+.nav-tab::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+    background: #e94560;
+    transition: width 0.3s;
+}
+.nav-tab:hover { color: #ccc; }
+.nav-tab.active {
+    color: #fff;
+}
+.nav-tab.active::after {
+    width: 60%;
+}
+
+/* ============================================================
+   主页容器（原有样式）
+   ============================================================ */
 .container {
     text-align: center;
     padding: 3rem;
@@ -16,6 +78,8 @@ body {
     background: rgba(255,255,255,0.05);
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    max-width: 560px;
+    width: 90%;
 }
 h1 {
     font-size: 2.5rem;
@@ -44,6 +108,7 @@ p {
     color: #fff;
     cursor: pointer;
     transition: background 0.3s, transform 0.2s;
+    font-family: inherit;
 }
 .btn:hover {
     background: #c73650;
@@ -79,5 +144,207 @@ p {
     box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 .hidden {
-    display: none;
+    display: none !important;
+}
+
+/* ============================================================
+   24点游戏样式
+   ============================================================ */
+.game24-container {
+    max-width: 640px;
+    padding: 2rem 2rem 2.5rem;
+}
+.game24-intro {
+    font-size: 1rem;
+    color: #a0a0b0;
+    margin-bottom: 1.8rem;
+}
+.game24-intro strong {
+    color: #e0e0e0;
+}
+.game24-hint {
+    font-size: 0.85rem;
+    color: #777;
+    margin: 0.6rem 0 1rem;
+}
+
+/* ----- 扑克牌 ----- */
+.cards {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-bottom: 0.2rem;
+}
+.card {
+    width: 100px;
+    height: 146px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    user-select: none;
+    position: relative;
+    flex-shrink: 0;
+}
+.card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+}
+.card:hover::before {
+    border-color: #e94560;
+}
+.card:active {
+    transform: translateY(-4px) scale(0.97);
+}
+.card .card-corner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.1;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+.card .card-corner.top  { align-self: flex-start; }
+.card .card-corner.bottom {
+    align-self: flex-end;
+    transform: rotate(180deg);
+}
+.card .card-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2.2rem;
+    opacity: 0.2;
+    font-weight: 400;
+}
+.card .card-suit { font-size: 0.85rem; }
+.card .card-suit-big { display: none; } /* 只在窄屏隐藏大花色，桌面用 */
+.card-rank { font-size: 1.1rem; }
+
+/* ----- 输入区域 ----- */
+.game24-input-area {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+.game24-input-area input {
+    flex: 1;
+    max-width: 340px;
+    padding: 12px 18px;
+    font-size: 1.1rem;
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    outline: none;
+    transition: border-color 0.3s;
+    font-family: inherit;
+    letter-spacing: 1px;
+}
+.game24-input-area input::placeholder {
+    color: #666;
+    letter-spacing: 0;
+}
+.game24-input-area input:focus {
+    border-color: #e94560;
+}
+.game24-btn {
+    margin-top: 0;
+    padding: 12px 22px;
+    flex-shrink: 0;
+}
+.game24-btn.secondary {
+    background: rgba(255,255,255,0.1);
+    color: #ccc;
+}
+.game24-btn.secondary:hover {
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+}
+
+/* ----- 操作按钮组 ----- */
+.game24-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    margin-bottom: 1.2rem;
+}
+.game24-actions .btn {
+    min-width: 100px;
+}
+
+/* ----- 结果显示 ----- */
+.game24-result {
+    min-height: 2.4rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background 0.3s, color 0.3s;
+    margin-bottom: 0.8rem;
+}
+.game24-result.success {
+    background: rgba(46,213,115,0.2);
+    color: #2ed573;
+}
+.game24-result.fail {
+    background: rgba(233,69,96,0.18);
+    color: #ff6b81;
+}
+.game24-result.hint {
+    background: rgba(255,193,7,0.15);
+    color: #ffc107;
+}
+.game24-result.warn {
+    background: rgba(255,165,0,0.13);
+    color: #ffa500;
+}
+
+/* ----- 统计 ----- */
+.game24-stats {
+    font-size: 0.95rem;
+    color: #888;
+}
+.game24-stats #scoreNum {
+    color: #2ed573;
+    font-weight: 600;
+}
+.game24-stats #totalNum {
+    color: #a0a0b0;
+    font-weight: 600;
+}
+
+/* ============================================================
+   响应式
+   ============================================================ */
+@media (max-width: 600px) {
+    body { padding-top: 64px; }
+    .nav-tab { padding: 12px 20px; font-size: 0.95rem; }
+    .container { padding: 1.5rem; }
+    .card { width: 74px; height: 108px; padding: 5px 7px; }
+    .card .card-corner { font-size: 0.75rem; }
+    .card .card-center { font-size: 1.5rem; }
+    .card-rank { font-size: 0.85rem; }
+    .cards { gap: 10px; }
+    .game24-container { padding: 1.5rem 1rem; }
+    .game24-input-area { flex-direction: column; }
+    .game24-input-area input { max-width: 100%; width: 100%; }
+    .game24-actions { flex-wrap: wrap; }
+    .game24-actions .btn { min-width: 80px; }
 }
